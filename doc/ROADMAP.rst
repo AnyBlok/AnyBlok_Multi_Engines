@@ -1,6 +1,5 @@
-.. This file is a part of the AnyBlok / Pyramid project
+.. This file is a part of the AnyBlok Multi Engines project
 ..
-..    Copyright (C) 2015 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
 ..    Copyright (C) 2016 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
 ..
 .. This Source Code Form is subject to the terms of the Mozilla Public License,

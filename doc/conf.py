@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# AnyBlok / Pyramid documentation build configuration file, created by
+# AnyBlok Multi Engines documentation build configuration file, created by
 # sphinx-quickstart on Wed Feb  4 16:19:23 2015.
 #
 # This file is execfile()d with the current directory set to its
@@ -201,7 +201,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'AnyBlokPyramid.tex', 'AnyBlok / Pyramid Documentation',
+    ('index', 'AnyBlokPyramid.tex', 'AnyBlok Multi Engines Documentation',
      'Jean-Sébastien Suzanne', 'manual'),
 ]
 
@@ -231,7 +231,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'anyblokpyramid', 'AnyBlok / Pyramid Documentation',
+    ('index', 'anyblokpyramid', 'AnyBlok Multi Engines Documentation',
      ['Jean-Sébastien Suzanne'], 1)
 ]
 
@@ -245,9 +245,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'AnyBlokPyramid', 'AnyBlok / Pyramid Documentation',
-     'Jean-Sébastien Suzanne', 'AnyBlokPyramid',
-     'One line description of project.', 'Miscellaneous'),
+    ('index', 'AnyBlokPyramid', 'AnyBlok Multi Engines Documentation',
+     'Jean-Sébastien Suzanne', 'AnyBlok Multi Engines',
+     'Allow master / slave engines', 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.
