@@ -1,4 +1,4 @@
-# This file is a part of the AnyBlok / Pyramid project
+# This file is a part of the AnyBlok Multi Engines project
 #
 #    Copyright (C) 2015 Jean-Sebastien SUZANNE <jssuzanne@anybox.fr>
 #
