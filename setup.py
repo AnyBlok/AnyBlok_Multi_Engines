@@ -31,9 +31,6 @@ with open(
 anyblok_init = [
     'anyblok_config=anyblok_multi_engines:anyblok_config',
 ]
-bloks = [
-    'multi-engines=anyblok_multi_engines.bloks.multi_engines:MultiEnginesBlok',
-]
 
 setup(
     name="anyblok_multi_engines",
@@ -60,7 +57,6 @@ setup(
     ],
     entry_points={
         'anyblok.init': anyblok_init,
-        'bloks': bloks,
     },
     extras_require={},
 )
