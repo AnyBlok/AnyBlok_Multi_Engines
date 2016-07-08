@@ -60,8 +60,8 @@ def update_database(group):
                             "the database")
 
 
-@Configuration.add('pluggins', must_be_loaded_by_unittest=True)
-def update_pluggins(group):
+@Configuration.add('plugins', must_be_loaded_by_unittest=True)
+def update_plugins(group):
     group.set_defaults(
         Registry='anyblok_multi_engines.registry:RegistryMultiEngines',
         get_url='anyblok_multi_engines.config:get_url')

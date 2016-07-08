@@ -7,5 +7,6 @@
 # obtain one at http://mozilla.org/MPL/2.0/.
 
 
-def anyblok_config():
+def anyblok_config(unittest=False):
+    from anyblok import config  # noqa import anyblok config definition
     from . import config  # noqa import config definition

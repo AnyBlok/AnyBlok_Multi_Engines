@@ -56,6 +56,8 @@ class MultiEngines:
             engine = create_engine(url, **kwargs)
             self.engines['wo'].append(engine)
             self.engines['ro'].append(engine)
+        elif not self.engines['wo']:
+            self.loadwithoutmigration = True
 
     def get_engine_for(self, ro=True):
         engines = self.engines['ro'] if ro else self.engines['wo']
@@ -85,7 +87,7 @@ class MultiEngines:
     @property
     def engine(self):
         if not self._engine:
-            self._engine = self.get_engine_for(ro=False)
+            self._engine = self.get_engine_for(ro=self.loadwithoutmigration)
 
         return self._engine
 
