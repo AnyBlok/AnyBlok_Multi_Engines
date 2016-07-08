@@ -18,7 +18,6 @@ install:
   - pip install flake8
   - pip install coverage
   - pip install nose
-  - pip install WebTest
   - pip install coveralls
   - python setup.py develop
 
@@ -29,8 +28,9 @@ env:
     - ANYBLOK_DATABASE_USER=postgres
 
 script:
+  - flake8 anyblok_multi_engines
   - psql -c 'create database travis_ci_test;' -U postgres
-  - nosetests anyblok_pyramid/tests -v -s --with-coverage --cover-package=anyblok_pyramid
+  - nosetests anyblok_multi_engines/tests -v -s --with-coverage --cover-package=anyblok_multi_engines
   
 after_success:
   coveralls
