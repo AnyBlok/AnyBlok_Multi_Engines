@@ -15,8 +15,23 @@ from random import choice
 
 
 class MixinSession:
+    """Mixin for the SQLAlchemy session the goal is to allow the connection
+    with more than one engine: masters / slaves engines
+    """
 
     def get_bind(self, mapper=None, clause=None):
+        """Overload the ``Session.get_bind`` method of SQLAlchemy
+
+        the rule are:
+
+        * if has session_connection: use the session_connection, because it
+          use during the creation of the AnyBlok Registry, which need get the
+          same bind
+        * if unittest_transaction: durring unittest, they are no
+          slaves / masters
+        * if flushing: write on the database then we use the master
+        * read the database then use a slave
+        """
         if self.registry.session_connection:
             return self.registry.session_connection
         elif self.registry.unittest_transaction:
@@ -28,8 +43,28 @@ class MixinSession:
 
 
 class MultiEngines:
+    """Mixin class which overload the AnyBlok Registry class
+
+    the goal is to implement in the the Registry the masters / slaves
+    behaviour
+    """
 
     def init_engine(self, db_name=None):
+        """Overload the initiation of engine to create more than one
+        engine
+
+        use the Configuration option to create engines:
+
+        * db_url: read and write engine
+        * db_ro_url: read only engines (list)
+        * db_wo_url: write only engines (list)
+
+        .. warning::
+
+            All the engines use the same database name not at the same location
+
+        :param db_name: name of the database for the engines
+        """
         kwargs = self.init_engine_options()
         gurl = Configuration.get('get_url', get_url)
         self.engines = {'ro': [], 'wo': []}
@@ -60,6 +95,12 @@ class MultiEngines:
             self.loadwithoutmigration = True
 
     def get_engine_for(self, ro=True):
+        """ Return one engine among the engines
+
+        :param ro: if True the engine will be read only else write only
+        :rtype: engine
+        :exception: RegistryException
+        """
         engines = self.engines['ro'] if ro else self.engines['wo']
         if not engines:
             raise RegistryException("No engine found for do action %r" % (
@@ -68,6 +109,7 @@ class MultiEngines:
         return choice(engines)
 
     def init_bind(self):
+        """ Initialise the bind for unittest"""
         self._bind = None
         self.unittest_transaction = None
         if self.unittest:
@@ -76,6 +118,7 @@ class MultiEngines:
 
     @property
     def bind(self):
+        """ Return the bind in function of engine"""
         if not self._bind:
             if self.unittest:
                 self._bind = self.unittest_bind
@@ -86,12 +129,15 @@ class MultiEngines:
 
     @property
     def engine(self):
+        """Return the engine"""
         if not self._engine:
             self._engine = self.get_engine_for(ro=self.loadwithoutmigration)
 
         return self._engine
 
     def create_session_factory(self):
+        """Overwrite the creation of Session factory to Use the multi binding
+        """
         if self.Session is None or self.must_recreate_session_factory():
             query_bases = [] + self.loaded_cores['Query']
             query_bases += [self.registry_base]
@@ -122,6 +168,7 @@ class MultiEngines:
         self.session_connection = None
 
     def close(self):
+        """Overwrite close to cloe all the engines"""
         self.close_session()
         for engine in set(self.engines['ro'] + self.engines['wo']):
             engine.dispose()
@@ -131,4 +178,4 @@ class MultiEngines:
 
 
 class RegistryMultiEngines(MultiEngines, Registry):
-    pass
+    """Pluging class"""

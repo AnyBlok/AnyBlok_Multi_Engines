@@ -10,3 +10,7 @@
 
 CHANGELOG
 =========
+
+* [IMP] PLugin Registry and get_url for master(s) / slave(s) engines
+* [ADD] doc
+* [IMP] unittest

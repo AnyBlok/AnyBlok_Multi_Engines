@@ -8,5 +8,40 @@
 
 .. contents::
 
-AnyBlok Multi Engines pluggins
-==============================
+AnyBlok Multi Engines framework
+===============================
+
+``Registry`` plugin
+-------------------
+
+.. automodule:: anyblok_multi_engines.registry
+
+Session
+~~~~~~~
+
+.. autoclass:: MixinSession
+    :members:
+    :noindex:
+    :show-inheritance:
+
+Mixin of the registry
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: MultiEngines
+    :members:
+    :noindex:
+    :show-inheritance:
+
+Plugin class
+~~~~~~~~~~~~
+
+.. autoclass:: RegistryMultiEngines
+    :members:
+    :noindex:
+    :show-inheritance:
+
+``get_url`` plugin
+------------------
+
+.. automodule:: anyblok_multi_engines.config
+.. autofunction:: get_url
