@@ -12,6 +12,10 @@ from anyblok.environment import EnvironmentManager
 from .config import get_url
 from sqlalchemy import create_engine
 from random import choice
+from logging import getLogger
+
+
+logger = getLogger(__name__)
 
 
 class MixinSession:
@@ -56,8 +60,8 @@ class MultiEngines:
         use the Configuration option to create engines:
 
         * db_url: read and write engine
-        * db_ro_url: read only engines (list)
-        * db_wo_url: write only engines (list)
+        * db_ro_urls: read only engines (list)
+        * db_wo_url: write only engines
 
         .. warning::
 
@@ -67,31 +71,39 @@ class MultiEngines:
         """
         kwargs = self.init_engine_options()
         gurl = Configuration.get('get_url', get_url)
-        self.engines = {'ro': [], 'wo': []}
-        url = Configuration.get('db_url')
+        self.engines = {'ro': [], 'wo': None}
         self._engine = None
-        if url:
-            url = gurl(db_name=db_name, url=url)
-            engine = create_engine(url, **kwargs)
-            self.engines['wo'].append(engine)
-            self.engines['ro'].append(engine)
 
-        for url in Configuration.get('db_ro_url', []) or []:
+        for url in Configuration.get('db_ro_urls', []) or []:
             url = gurl(db_name=db_name, url=url)
             engine = create_engine(url, **kwargs)
             self.engines['ro'].append(engine)
 
-        for url in Configuration.get('db_wo_url', []) or []:
+        wo_url = Configuration.get('db_wo_url')
+        if wo_url:
+            url = gurl(db_name=db_name, url=wo_url)
+            engine = create_engine(url, **kwargs)
+            self.engines['wo'] = engine
+
+        url = Configuration.get('db_url')
+        if url and wo_url:
+            raise RegistryException(
+                "You have not to use the both Configuration option "
+                "--get-wo-url [%s] and --get-url [%s], chose only one of them "
+                "because only one master can be chose" % (wo_url, url))
+        elif url:
             url = gurl(db_name=db_name, url=url)
             engine = create_engine(url, **kwargs)
-            self.engines['wo'].append(engine)
+            self.engines['wo'] = engine
+            self.engines['ro'].append(engine)
 
         if not self.engines['ro'] and not self.engines['wo']:
             url = gurl(db_name=db_name)
             engine = create_engine(url, **kwargs)
-            self.engines['wo'].append(engine)
+            self.engines['wo'] = engine
             self.engines['ro'].append(engine)
         elif not self.engines['wo']:
+            logger.debug('No WRITE engine defined use READ ONLY mode')
             self.loadwithoutmigration = True
 
     def get_engine_for(self, ro=True):
@@ -106,7 +118,10 @@ class MultiEngines:
             raise RegistryException("No engine found for do action %r" % (
                 "read" if ro else "write"))
 
-        return choice(engines)
+        if ro:
+            return choice(engines)
+
+        return engines
 
     def init_bind(self):
         """ Initialise the bind for unittest"""
@@ -170,8 +185,11 @@ class MultiEngines:
     def close(self):
         """Overwrite close to cloe all the engines"""
         self.close_session()
-        for engine in set(self.engines['ro'] + self.engines['wo']):
+        for engine in self.engines['ro']:
             engine.dispose()
+
+        if self.engines['wo']:
+            self.engines['wo'].dispose()
 
         if self.db_name in RegistryManager.registries:
             del RegistryManager.registries[self.db_name]

@@ -48,16 +48,16 @@ def get_url(db_name=None, url=None):
 
 @Configuration.add('database')
 def update_database(group):
-    group.add_argument('--db-ro-url',
+    group.add_argument('--db-ro-urls',
                        default=os.environ.get('ANYBLOK_DATABASE_URL_RO'),
                        type=list,
                        help="Complete URL(s) for read only connection with "
                             "the database")
     group.add_argument('--db-wo-url',
                        default=os.environ.get('ANYBLOK_DATABASE_URL_WO'),
-                       type=list,
-                       help="Complete URL(s) for write only connection with "
-                            "the database")
+                       help="Complete URL for write only connection with "
+                            "the database, you can't use bothg --db-wo-url "
+                            "and --db-url")
 
 
 @Configuration.add('plugins', must_be_loaded_by_unittest=True)

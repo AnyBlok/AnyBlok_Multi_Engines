@@ -5,28 +5,17 @@
 # This Source Code Form is subject to the terms of the Mozilla Public License,
 # v. 2.0. If a copy of the MPL was not distributed with this file,You can
 # obtain one at http://mozilla.org/MPL/2.0/.
-from anyblok.tests.testcase import DBTestCase
+from anyblok.tests.testcase import DBTestCase, LogCapture
 from anyblok.config import Configuration
 from anyblok_multi_engines.registry import RegistryMultiEngines as Registry
 from anyblok.registry import RegistryException
+from logging import DEBUG
 
 
 class TestRegistry(DBTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super(TestRegistry, cls).setUpClass()
-        cls.old_configuration = Configuration.configuration.copy()
-
-    @classmethod
-    def tearDownClass(cls):
-        super(TestRegistry, cls).tearDownClass()
-        Configuration.configuration = cls.old_configuration
-
     def setUp(self):
         super(TestRegistry, self).setUp()
-        Configuration.configuration = self.__class__.old_configuration.copy()
-        Configuration.update(**dict(db_url=None, db_ro_url=[], db_wo_url=[]))
         self._registry = None
 
     def tearDown(self):
@@ -40,45 +29,58 @@ class TestRegistry(DBTestCase):
         return self._registry
 
     def test_init(self):
-        registry = self.get_registry()
-        self.assertTrue(registry.System.Model.query().count())
+        with DBTestCase.Configuration(
+            db_ro_urls=[], db_url='', db_wo_url=''
+        ):
+            registry = self.get_registry()
+            self.assertTrue(registry.System.Model.query().count())
 
     def test_get_engine_ro(self):
-        Configuration.update(**dict(db_ro_url=['postgres:///']))
-        registry = self.get_registry()
-        self.assertTrue(registry.engines['ro'])
-        self.assertFalse(registry.engines['wo'])
-        engine = registry.get_engine_for()
-        self.assertIn(engine, registry.engines['ro'])
+        with DBTestCase.Configuration(
+            db_ro_urls=['postgres:///'], db_url='', db_wo_url=''
+        ):
+            registry = self.get_registry()
+            self.assertTrue(registry.engines['ro'])
+            self.assertIsNone(registry.engines['wo'])
+            engine = registry.get_engine_for()
+            self.assertIn(engine, registry.engines['ro'])
 
     def test_get_engine_ro_without_r(self):
-        Configuration.update(**dict(db_wo_url=['postgres:///']))
-        registry = self.get_registry()
-        with self.assertRaises(RegistryException):
-            registry.get_engine_for()
+        with DBTestCase.Configuration(
+            db_ro_urls=[], db_url='', db_wo_url='postgres:///'
+        ):
+            registry = self.get_registry()
+            with self.assertRaises(RegistryException):
+                registry.get_engine_for()
 
     def test_get_engine_rw(self):
-        Configuration.update(**dict(db_url='postgres:///'))
-        registry = self.get_registry()
-        self.assertTrue(registry.engines['ro'])
-        self.assertTrue(registry.engines['wo'])
-        engine = registry.get_engine_for()
-        self.assertIn(engine, registry.engines['ro'])
-        self.assertIn(engine, registry.engines['wo'])
+        with DBTestCase.Configuration(
+            db_ro_urls=[], db_url='postgres:///', db_wo_url=''
+        ):
+            registry = self.get_registry()
+            self.assertTrue(registry.engines['ro'])
+            self.assertIsNotNone(registry.engines['wo'])
+            engine = registry.get_engine_for()
+            self.assertIn(engine, registry.engines['ro'])
+            self.assertIs(engine, registry.engines['wo'])
 
     def test_get_engine_wo(self):
-        Configuration.update(**dict(db_wo_url=['postgres:///']))
-        registry = self.get_registry()
-        self.assertTrue(registry.engines['wo'])
-        self.assertFalse(registry.engines['ro'])
-        engine = registry.get_engine_for(ro=False)
-        self.assertIn(engine, registry.engines['wo'])
+        with DBTestCase.Configuration(
+            db_ro_urls=[], db_url='', db_wo_url='postgres:///'
+        ):
+            registry = self.get_registry()
+            self.assertIsNotNone(registry.engines['wo'])
+            self.assertFalse(registry.engines['ro'])
+            engine = registry.get_engine_for(ro=False)
+            self.assertIs(engine, registry.engines['wo'])
 
     def test_get_engine_wo_without_w(self):
-        Configuration.update(**dict(db_ro_url=['postgres:///']))
-        registry = self.get_registry()
-        with self.assertRaises(RegistryException):
-            registry.get_engine_for(ro=False)
+        with DBTestCase.Configuration(
+            db_ro_urls=['postgres:///'], db_url='', db_wo_url=''
+        ):
+            registry = self.get_registry()
+            with self.assertRaises(RegistryException):
+                registry.get_engine_for(ro=False)
 
     def test_bind(self):
         registry = self.get_registry()
@@ -93,20 +95,29 @@ class TestRegistry(DBTestCase):
         self.assertIs(bind1, bind2)
 
     def test_engine(self):
-        Configuration.update(**dict(db_ro_url=['postgres:///'],
-                                    db_wo_url=['postgres:///']))
-        registry = self.get_registry()
-        self.assertIs(registry.engine, registry._engine)
-        self.assertIn(registry.engine, registry.engines['wo'])
-        self.assertNotIn(registry.engine, registry.engines['ro'])
+        with DBTestCase.Configuration(
+            db_ro_urls=['postgres:///'], db_url='', db_wo_url='postgres:///'
+        ):
+            registry = self.get_registry()
+            self.assertIs(registry.engine, registry._engine)
+            self.assertIs(registry.engine, registry.engines['wo'])
+            self.assertNotIn(registry.engine, registry.engines['ro'])
 
     def test_engine_with_loadwithoutmigration(self):
-        Configuration.update(**dict(db_ro_url=['postgres:///'],
-                                    db_wo_url=['postgres:///']))
-        registry = self.get_registry(loadwithoutmigration=True)
-        self.assertIs(registry.engine, registry._engine)
-        self.assertIn(registry.engine, registry.engines['ro'])
-        self.assertNotIn(registry.engine, registry.engines['wo'])
+        with DBTestCase.Configuration(
+            db_ro_urls=['postgres:///'], db_url='', db_wo_url='postgres:///'
+        ):
+            registry = self.get_registry(loadwithoutmigration=True)
+            self.assertIs(registry.engine, registry._engine)
+            self.assertIn(registry.engine, registry.engines['ro'])
+            self.assertIsNot(registry.engine, registry.engines['wo'])
+
+    def test_db_url_and_db_wo_url(self):
+        with DBTestCase.Configuration(
+            db_ro_urls=[], db_url='postgres:///', db_wo_url='postgres:///'
+        ):
+            with self.assertRaises(RegistryException):
+                self.get_registry()
 
     def test_commit(self):
         registry = self.get_registry()
@@ -115,6 +126,12 @@ class TestRegistry(DBTestCase):
         self.assertIsNone(registry.session_connection)
 
     def test_ro_force_no_automigration(self):
-        Configuration.update(**dict(db_ro_url=['postgres:///']))
-        registry = self.get_registry()
-        self.assertTrue(registry.loadwithoutmigration)
+        with DBTestCase.Configuration(
+            db_ro_urls=['postgres:///'], db_url='', db_wo_url=''
+        ):
+            with LogCapture('anyblok_multi_engines.registry',
+                            level=DEBUG) as logs:
+                self.get_registry()
+                messages = logs.get_debug_messages()
+                self.assertIn('No WRITE engine defined use READ ONLY mode',
+                              messages)
