@@ -6,16 +6,16 @@
 .. v. 2.0. If a copy of the MPL was not distributed with this file,You can
 .. obtain one at http://mozilla.org/MPL/2.0/.
 
-.. image:: https://travis-ci.org/AnyBlok/Anyblok_Multi_Engines.svg?branch=master
-    :target: https://travis-ci.org/AnyBlok/Anyblok_Multi_Engines
+.. image:: https://travis-ci.org/AnyBlok/AnyBlok_Multi_Engines.svg?branch=master
+    :target: https://travis-ci.org/AnyBlok/AnyBlok_Multi_Engines
     :alt: Build status
 
-.. image:: https://coveralls.io/repos/github/AnyBlok/Anyblok_Multi_Engines/badge.svg?branch=master
-    :target: https://coveralls.io/github/AnyBlok/Anyblok_Multi_Engines?branch=master
+.. image:: https://coveralls.io/repos/github/AnyBlok/AnyBlok_Multi_Engines/badge.svg?branch=master
+    :target: https://coveralls.io/github/AnyBlok/AnyBlok_Multi_Engines?branch=master
     :alt: Coverage
 
-.. image:: https://img.shields.io/pypi/v/Anyblok_Multi_Engines.svg
-   :target: https://pypi.python.org/pypi/Anyblok_Multi_Engines/
+.. image:: https://img.shields.io/pypi/v/AnyBlok_Multi_Engines.svg
+   :target: https://pypi.python.org/pypi/AnyBlok_Multi_Engines/
    :alt: Version status
          
 .. image:: https://readthedocs.org/projects/anyblok-multi-engines/badge/?version=latest
