@@ -9,8 +9,9 @@ from anyblok.registry import Registry, RegistryException, RegistryManager
 from anyblok.config import Configuration
 from sqlalchemy.orm import sessionmaker, scoped_session
 from anyblok.environment import EnvironmentManager
-from .config import get_url
+from anyblok_multi_engines.config import get_url
 from sqlalchemy import create_engine
+from sqlalchemy_utils.functions import database_exists
 from random import choice
 from logging import getLogger
 
@@ -193,6 +194,33 @@ class MultiEngines:
 
         if self.db_name in RegistryManager.registries:
             del RegistryManager.registries[self.db_name]
+
+    @classmethod
+    def db_exists(cls, db_name=None):
+        if not db_name:
+            raise RegistryException('db_name is required')
+
+        urls = []
+        url = Configuration.get('db_url')
+        if url:
+            urls.append(url)
+
+        wo_url = Configuration.get('db_wo_url')
+        if wo_url:
+            urls.append(wo_url)
+
+        for ro_url in Configuration.get('db_ro_urls', []) or []:
+            urls.append(ro_url)
+
+        gurl = Configuration.get('get_url', get_url)
+        for url in urls:
+            url = gurl(db_name=db_name, url=url)
+            if not database_exists(url):
+                return False
+        else:
+            return database_exists(gurl(db_name=db_name))
+
+        return True
 
 
 class RegistryMultiEngines(MultiEngines, Registry):
