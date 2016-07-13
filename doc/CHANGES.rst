@@ -11,6 +11,9 @@
 CHANGELOG
 =========
 
+1.0.0 (2016-07-13)
+------------------
+
 * [IMP] PLugin Registry and get_url for master(s) / slave(s) engines
 * [ADD] doc
 * [IMP] unittest
