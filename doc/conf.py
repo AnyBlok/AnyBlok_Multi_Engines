@@ -201,7 +201,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'AnyBlokPyramid.tex', 'AnyBlok Multi Engines Documentation',
+    ('index', 'AnyBlokMultiEngines.tex', 'AnyBlok Multi Engines Documentation',
      'Jean-Sébastien Suzanne', 'manual'),
 ]
 
@@ -245,7 +245,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'AnyBlokPyramid', 'AnyBlok Multi Engines Documentation',
+    ('index', 'AnyBlokMultiEngines', 'AnyBlok Multi Engines Documentation',
      'Jean-Sébastien Suzanne', 'AnyBlok Multi Engines',
      'Allow master / slave engines', 'Miscellaneous'),
 ]
