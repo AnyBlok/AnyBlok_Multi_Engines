@@ -52,11 +52,17 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
     ],
     entry_points={
         'anyblok.init': anyblok_init,
+        'test_bloks': [
+            'test-me-blok1=anyblok_multi_engines.test_bloks.test1:Test1Blok',
+            'test-me-blok2=anyblok_multi_engines.test_bloks.test2:Test2Blok',
+            'test-me-blok3=anyblok_multi_engines.test_bloks.test3:Test3Blok',
+        ],
     },
     extras_require={},
 )
