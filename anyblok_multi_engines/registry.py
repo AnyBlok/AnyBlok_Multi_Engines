@@ -29,17 +29,12 @@ class MixinSession:
 
         the rule are:
 
-        * if has session_connection: use the session_connection, because it
-          use during the creation of the AnyBlok Registry, which need get the
-          same bind
         * if unittest_transaction: durring unittest, they are no
           slaves / masters
         * if flushing: write on the database then we use the master
         * read the database then use a slave
         """
-        if self.registry.session_connection:
-            return self.registry.session_connection
-        elif self.registry.unittest_transaction:
+        if self.registry.unittest_transaction:
             return self.registry.bind
         elif self._flushing:
             return self.registry.get_engine_for(ro=False)
@@ -155,17 +150,23 @@ class MultiEngines:
         """Overwrite the creation of Session factory to Use the multi binding
         """
         if self.Session is None or self.must_recreate_session_factory():
+            if self.Session:
+                if not self.withoutautomigration:
+                    # this is the only case to use commit in the construction
+                    # of the registry
+                    self.commit()
+
+                # remove all existing instance to create a new instance
+                # because the instance are cached
+                self.Session.remove()
+
             query_bases = [] + self.loaded_cores['Query']
             query_bases += [self.registry_base]
             Query = type('Query', tuple(query_bases), {})
             session_bases = [self.registry_base, MixinSession]
-            session_bases.extend(self.loaded_cores['Session'])
+            session_bases += self.loaded_cores['Session']
             Session = type('Session', tuple(session_bases), {
                 'registry_query': Query})
-
-            self.session_connection = None
-            if self.Session:
-                self.session_connection = self.connection()
 
             extension = self.additional_setting.get('sa.session.extension')
             if extension:
@@ -178,10 +179,6 @@ class MultiEngines:
             self.nb_session_bases = len(self.loaded_cores['Session'])
         else:
             self.flush()
-
-    def commit(self, *args, **kwargs):
-        super(MultiEngines, self).commit(*args, **kwargs)
-        self.session_connection = None
 
     def close(self):
         """Overwrite close to cloe all the engines"""
