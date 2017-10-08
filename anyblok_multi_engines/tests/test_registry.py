@@ -119,12 +119,6 @@ class TestRegistry(DBTestCase):
             with self.assertRaises(RegistryException):
                 self.get_registry()
 
-    def test_commit(self):
-        registry = self.get_registry()
-        registry.session_connection = 'False value'
-        registry.commit()
-        self.assertIsNone(registry.session_connection)
-
     def test_ro_force_no_automigration(self):
         with DBTestCase.Configuration(
             db_ro_urls=['postgresql:///'], db_url='', db_wo_url=''
