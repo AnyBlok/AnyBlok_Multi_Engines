@@ -11,8 +11,8 @@
 CHANGELOG
 =========
 
-Future
-------
+1.0.1 (2017-10-08)
+------------------
 
 * [FIX] doc
 * [FIX] use a better way to install blok wich inherit Query or Session
