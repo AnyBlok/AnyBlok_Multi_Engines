@@ -177,6 +177,7 @@ class MultiEngines:
                 EnvironmentManager.scoped_function_for_session())
             self.nb_query_bases = len(self.loaded_cores['Query'])
             self.nb_session_bases = len(self.loaded_cores['Session'])
+            self.apply_session_events()
         else:
             self.flush()
 

@@ -11,6 +11,11 @@
 CHANGELOG
 =========
 
+1.1.0
+-----
+
+* [REF] add session event from AnyBlok 0.12.0
+
 1.0.1 (2017-10-08)
 ------------------
 
