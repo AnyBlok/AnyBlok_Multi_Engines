@@ -1,0 +1,14 @@
+[run]
+omit =
+    # omit scripts file
+    anyblok_multi_engines/release.py
+    # omit anything in a tests directory anywhere
+    anyblok_multi_engines/tests/*
+    # omit anything in a test_bloks directory anywhere
+    anyblok_multi_engines/test_bloks/*
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # unexecuting logger
+    logger\.
